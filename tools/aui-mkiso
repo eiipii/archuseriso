@@ -48,6 +48,8 @@ _help () {
         echo '-v, --verbose                       Verbose mode'
         echo '--zfs                               Add ZFS support. Dynamically builds the ZFS packages before'
         echo '                                    building the iso image'
+        echo '--efiboot <bootloader>              Select the EFI bootloader to use (default: refind).'
+        echo '                                    Provided bootloaders: refind, systemd'
         echo
         echo 'ISO profiles:'
         echo 'console, cinnamon, deepin, gnome, i3, kde, lxqt, mate, xfce'
@@ -163,7 +165,7 @@ _build_zfs_packages () {
 }
 
 OPTS=$(getopt -o 'C:hl:v' -l 'addi3wm,addpkg:,confdir:,embeddir:,help' \
-       -l 'language:,nvidia,optimus,pkgdir:,testing:,verbose,zfs' -n 'aui-mkiso' -- "$@")
+       -l 'language:,nvidia,optimus,pkgdir:,testing:,verbose,zfs,efiboot:' -n 'aui-mkiso' -- "$@")
 [[ $? -eq 0 ]] || _usage 1
 eval set -- "${OPTS}"
 unset OPTS
@@ -213,6 +215,9 @@ while true; do
                         AUI_ZFSSUPPORT="yes"
                         AUI_ISONAME+=(zfs)
                         shift ;;
+                '--efiboot')
+                        options+="--efiboot ${2}"
+                        shift 2 ;;
                 '--')
                         shift
                         break ;;

@@ -17,6 +17,7 @@ gpg_key=""
 lang=""
 comp_type=zstd
 profile=xfce
+efiboot="refind"
 
 verbose=""
 
@@ -366,7 +367,15 @@ make_isolinux() {
 # Prepare /EFI
 make_efi() {
     mkdir -p "${work_dir}/iso/EFI/boot" "${work_dir}/iso/EFI/live"
-    cp "${work_dir}/x86_64/airootfs/usr/share/refind/refind_x64.efi" "${work_dir}/iso/EFI/boot/bootx64.efi"
+
+    ## Select the bootloader to use
+    if [[ "${efiboot}" = 'refind' ]]; then
+        cp "${work_dir}/x86_64/airootfs/usr/share/refind/refind_x64.efi" "${work_dir}/iso/EFI/boot/bootx64.efi"
+    fi
+    if [[ "${efiboot}" = 'systemd' ]]; then
+        cp "${work_dir}/x86_64/airootfs/usr/lib/systemd/boot/efi/systemd-bootx64.efi" "${work_dir}/iso/EFI/boot/bootx64.efi"
+    fi
+
     cp -a "${work_dir}"/x86_64/airootfs/usr/share/refind/{drivers_x64,icons}/ "${work_dir}/iso/EFI/boot/"
 
     cp "${work_dir}/x86_64/airootfs/usr/lib/systemd/boot/efi/systemd-bootx64.efi" "${work_dir}/iso/EFI/live/livedisk.efi"
@@ -407,7 +416,13 @@ make_efiboot() {
     cp "${work_dir}/iso/${install_dir}/boot/amd-ucode.img" "${work_dir}/efiboot/EFI/archiso/"
 
     mkdir -p "${work_dir}/efiboot/EFI/boot" "${work_dir}/efiboot/EFI/live"
-    cp "${work_dir}/x86_64/airootfs/usr/share/refind/refind_x64.efi" "${work_dir}/efiboot/EFI/boot/bootx64.efi"
+
+    if [[ "${efiboot}" = 'refind' ]]; then
+        cp "${work_dir}/x86_64/airootfs/usr/share/refind/refind_x64.efi" "${work_dir}/iso/EFI/boot/bootx64.efi"
+    fi
+    if [[ "${efiboot}" = 'systemd' ]]; then
+        cp "${work_dir}/x86_64/airootfs/usr/lib/systemd/boot/efi/systemd-bootx64.efi" "${work_dir}/iso/EFI/boot/bootx64.efi"
+    fi
     cp -a "${work_dir}"/x86_64/airootfs/usr/share/refind/{drivers_x64,icons}/ "${work_dir}/efiboot/EFI/boot/"
 
     cp "${work_dir}/x86_64/airootfs/usr/lib/systemd/boot/efi/systemd-bootx64.efi" "${work_dir}/efiboot/EFI/live/livedvd.efi"
@@ -533,7 +548,7 @@ make_iso() {
 }
 
 OPTS=$(getopt -o 'A:c:D:g:hL:l:N:o:P:p:V:vw:' -l 'name,version:,label:,publisher:,application:' \
-       -l 'installdir:,workdir:,outdir:,gpgkey:,verbose,language:,comptype:' \
+       -l 'installdir:,workdir:,outdir:,gpgkey:,verbose,language:,comptype:,efiboot:' \
        -l 'profile:,testing:,help' -n 'build.sh' -- "$@")
 [[ $? -eq 0 ]] || _usage 1
 eval set -- "${OPTS}"
@@ -558,6 +573,13 @@ while true; do
             _usage 0 ;;
         '-L'|'--label')
             iso_label="${2}"
+            shift 2 ;;
+        '--efiboot')
+            case "${2}" in
+                'refind') efiboot="${2}";;
+                'systemd') efiboot="${2}";;
+                *) _usage 1;;
+            esac
             shift 2 ;;
         '-l'|'--language')
             case "${2}" in

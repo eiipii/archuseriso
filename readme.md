@@ -118,6 +118,8 @@ Live USB partition layout created by `aui-mkusb`:
     -C, --confdir <path>                Archuseriso directory path (default: /usr/share/archuseriso)
     --embeddir <directory path>         Embed directory in the iso image. Data will be available
                                         from the user's live session
+    --efiboot <bootloader>              Select the EFI bootloader to use (default: refind).
+                                        Provided bootloaders: refind, systemd
     -l, --language <language>           Set default language:
                                         cz, de, es, fr, gr, hu, it, nl, pl, pt, ro, rs, ru, tr, ua
     --nvidia                            Add Nvidia graphics driver
