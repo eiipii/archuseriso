@@ -50,6 +50,9 @@ _help () {
         echo '                                    building the iso image'
         echo '--efiboot <bootloader>              Select the EFI bootloader to use (default: refind).'
         echo '                                    Provided bootloaders: refind, systemd'
+        echo '--rootoverwrite <path>              Directory containing custom files overwrites to the root filesystem'
+        echo '                                    Files will be copied between the profile base structure'
+        echo '                                    and before packages installation.'
         echo
         echo 'ISO profiles:'
         echo 'console, cinnamon, deepin, gnome, i3, kde, lxqt, mate, xfce'
@@ -165,7 +168,7 @@ _build_zfs_packages () {
 }
 
 OPTS=$(getopt -o 'C:hl:v' -l 'addi3wm,addpkg:,confdir:,embeddir:,help' \
-       -l 'language:,nvidia,optimus,pkgdir:,testing:,verbose,zfs,efiboot:' -n 'aui-mkiso' -- "$@")
+       -l 'language:,nvidia,optimus,pkgdir:,testing:,verbose,zfs,efiboot:,rootoverwrite:' -n 'aui-mkiso' -- "$@")
 [[ $? -eq 0 ]] || _usage 1
 eval set -- "${OPTS}"
 unset OPTS
@@ -217,6 +220,9 @@ while true; do
                         shift ;;
                 '--efiboot')
                         options+="--efiboot ${2}"
+                        shift 2 ;;
+                '--rootoverwrite')
+                        export AUI_ROOTOVERWRITEDIR="${2}"
                         shift 2 ;;
                 '--')
                         shift

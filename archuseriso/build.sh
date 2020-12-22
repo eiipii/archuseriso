@@ -175,6 +175,10 @@ make_custom_airootfs() {
                 cp -af --no-preserve=ownership -- "${profile_path}/lang/${lang}/airootfs/." "${_airootfs}"
             fi
         fi
+        # Copy the overwrite root content
+        if [[ -n "${AUI_ROOTOVERWRITEDIR:-}" && -d "${AUI_ROOTOVERWRITEDIR:-}" ]]; then
+            cp -afT --no-preserve=ownership -- "${AUI_ROOTOVERWRITEDIR}/." "${_airootfs}"
+        fi
 
         [[ -e "${_airootfs}/etc/shadow" ]] && chmod -f 0400 -- "${_airootfs}/etc/shadow"
         [[ -e "${_airootfs}/etc/gshadow" ]] && chmod -f 0400 -- "${_airootfs}/etc/gshadow"
